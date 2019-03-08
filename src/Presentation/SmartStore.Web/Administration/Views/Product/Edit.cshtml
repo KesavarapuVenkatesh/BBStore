@@ -1,0 +1,207 @@
+﻿@model ProductModel
+@using Telerik.Web.Mvc.UI;
+@using SmartStore.Core.Domain.Catalog;
+@{
+	ViewBag.Title = T("Admin.Catalog.Products.EditProductDetails").Text;
+}
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "product-form" })) {
+    <div class="section-header">
+        <div class="title">
+            @if (!String.IsNullOrEmpty(Model.PictureThumbnailUrl)) {
+                <img src="@Url.Content(Model.PictureThumbnailUrl)" />
+			}
+            @T("Admin.Catalog.Products.EditProductDetails") - <span title="@Model.Name">@Model.Name.Truncate(45, "...")</span> 
+			<a href='@Url.Action("List")'>(@T("Admin.Catalog.Products.BackToList"))</a>
+        </div>
+        <div class="options">
+			@{ Html.RenderWidget("admin_button_toolbar_before"); }
+
+			<button type="submit" name="preview" value="preview" onclick="javascript:openWindow('@Model.ProductUrl', 1000, 600, true); return false;" class="btn btn-secondary">
+                <i class="fa fa-eye"></i>
+                <span>@T("Admin.Common.Preview")</span>
+            </button>
+			<button type="submit" value="save" class="btn btn-warning entity-commit-trigger" data-commit-type="product" data-commit-action="update" data-commit-id="@Model.Id">
+				<i class="fa fa-check"></i>
+				<span>@T("Admin.Common.Save")</span>
+			</button>
+			<button type="submit" value="save-continue" class="btn btn-secondary entity-commit-trigger" data-commit-type="product" data-commit-action="update" data-commit-id="@Model.Id">
+				@T("Admin.Common.SaveContinue")
+			</button>
+			<a href="#copyproduct-window" data-toggle="modal" class="btn btn-secondary">
+				<i class="fa fa-files-o"></i>
+				<span>@T("Admin.Catalog.Products.Copy")</span>
+			</a>
+			<button type="submit" id="product-delete" class="btn btn-danger">
+				<i class="fa fa-trash-o"></i>
+				<span>@T("Admin.Common.Delete")</span>
+			</button>
+
+			@{ Html.RenderWidget("admin_button_toolbar_after"); }
+        </div>
+    </div>
+
+    Html.RenderPartial("_CreateOrUpdate", Model);
+}
+@Html.DeleteConfirmation("product-delete")
+
+@{Html.SmartStore().Window()
+		.Name("copyproduct-window")
+		.Title(T("Admin.Catalog.Products.Copy"))
+		.Size(WindowSize.Large)
+		.Content(@<text>
+			<form method="POST" action="@Url.Action("CopyProduct", "Product")">
+				@Html.HiddenFor(model => Model.CopyProductModel.Id)
+				<table class="adminContent">
+					<tr>
+						<td class="adminTitle">
+							@Html.SmartLabelFor(model => model.CopyProductModel.NumberOfCopies)
+						</td>
+						<td class="adminData">
+							@Html.EditorFor(model => Model.CopyProductModel.NumberOfCopies)
+						</td>
+					</tr>
+					<tr>
+						<td class="adminTitle">
+							@Html.SmartLabelFor(model => model.CopyProductModel.Name)
+						</td>
+						<td class="adminData">
+							@Html.EditorFor(model => Model.CopyProductModel.Name)
+						</td>
+					</tr>
+					<tr>
+						<td class="adminTitle">
+							@Html.SmartLabelFor(model => model.CopyProductModel.Published)
+						</td>
+						<td class="adminData">
+							@Html.EditorFor(model => Model.CopyProductModel.Published)
+						</td>
+					</tr>
+					<tr>
+						<td class="adminTitle">
+							@Html.SmartLabelFor(model => model.CopyProductModel.CopyImages)
+						</td>
+						<td class="adminData">
+							@Html.EditorFor(model => Model.CopyProductModel.CopyImages)
+						</td>
+					</tr>
+				</table>
+			</form>
+		</text>)
+	.FooterContent(@<text>
+		<button id="copyproduct" type="button" class="btn btn-primary">
+			<i class="fa fa-files-o"></i>
+			<span>@T("Admin.Catalog.Products.Copy")</span>
+		</button>
+	</text>)
+	.Render();
+}
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		// Copy product
+        $("#copyproduct").click(function (e) {
+            e.preventDefault();
+            $('#copyproduct-window').find('form').submit();
+        });
+
+    	// Show modal dialog to copy attribute options
+        $(document).on('change', '#productvariantattributes-grid select[id^=OptionsSetsChoice]', function (e) {
+        	e.stopPropagation();
+
+        	var select = $(e.currentTarget),
+				form = $('#CopyOptionsForm'),
+				valueCount = parseInt(select.attr('data-valcount')),
+				productVariantAttributeId = select.attr('id').replace('OptionsSetsChoice', '');
+
+        	form.find('input[name=productVariantAttributeId]').val(productVariantAttributeId);
+        	form.find('input[name=optionsSetId]').val(select.val());
+
+        	if (valueCount > 0) {
+        		var hint = $('#CopyOptionsHintTemplate').text().replace('{0}', select.find(':selected').text());
+        		$('#CopyOptionsHint').text(hint);
+
+        		$('#CopyAttributeOptionsDialog').modal('show');
+        	}
+        	else {
+        		$('#btnCopyAttributeOptions').trigger('click');
+        	}
+        });
+
+    	// Copy attribute options
+        $('#btnCopyAttributeOptions').click(function () {
+        	$('#CopyOptionsForm').doAjax({
+        		type: 'POST',
+        		callbackSuccess: function () {
+        			$('#productvariantattributes-grid').data('tGrid').ajaxRequest();
+        		}
+        	});
+        });
+
+		// Bundle per item pricing
+        $(document).on('change', '#@Html.FieldIdFor(model => model.BundlePerItemPricing)', function () {
+        	bundlePerItemPricing($(this).is(':checked'));
+        });
+
+		bundlePerItemPricing(@((Model.ProductTypeId == (int)ProductType.BundledProduct && Model.BundlePerItemPricing).ToString().ToLower()));
+
+        function bundlePerItemPricing(isActive) {
+        	$('#TierPriceContainer').toggle(!isActive);
+        	$('#group-prices').find('.base-price').toggle(!isActive);
+        	$('a[href="#tab-discounts"]').parent().toggle(!isActive);
+        }
+
+		// Bundle per item in shopping cart
+        $(document).on('change', '#@Html.FieldIdFor(model => model.BundlePerItemShoppingCart)', function () {
+        	bundlePerItemShoppingCart($(this).is(':checked'));
+        });
+
+		bundlePerItemShoppingCart(@((Model.ProductTypeId == (int)ProductType.BundledProduct && Model.BundlePerItemShoppingCart).ToString().ToLower()));
+
+        function bundlePerItemShoppingCart(isActive) {
+        	$('a[href="#tab-inventory"]').parent().toggle(!isActive);
+        }
+
+    });
+</script>
+
+@if (Model.Id != 0 && Model.NumberOfAvailableProductAttributes > 0)
+{
+	Html.SmartStore().Window()
+		.Name("CopyAttributeOptionsDialog")
+		.Title(T("Admin.Catalog.Products.ProductVariantAttributes.Attributes.Values.CopyOptions"))
+		.Size(WindowSize.Large)
+		.Content(@<text>
+			<form id="CopyOptionsForm" method="POST" action="@Url.Action("CopyAttributeOptions", "Product")">
+				<input type="hidden" name="productVariantAttributeId" value="" />
+				<input type="hidden" name="optionsSetId" value="" />
+
+				<div id="CopyOptionsHintTemplate" class="hide">@T("Admin.Catalog.Products.ProductVariantAttributes.Attributes.Values.CopyOptionsHint")</div>
+				<p id="CopyOptionsHint"></p>
+
+				<div>
+					<p>@T("Admin.Catalog.Products.ProductVariantAttributes.Attributes.Values.AskExistingValues")</p>
+					<div class="form-check">
+						<input type="radio" class="form-check-input" name="deleteExistingValues" id="deleteExistingValues_1" value="false" checked="checked" />
+						<label class="form-check-label" for="deleteExistingValues_1">
+							@T("Admin.Catalog.Products.ProductVariantAttributes.Attributes.Values.MergeExistingValues")
+						</label>
+					</div>
+					<div class="form-check">
+						<input type="radio" class="form-check-input" name="deleteExistingValues" id="deleteExistingValues_2" value="true" />
+						<label class="form-check-label" for="deleteExistingValues_2">
+							@T("Admin.Catalog.Products.ProductVariantAttributes.Attributes.Values.DeleteExistingValues")
+						</label>
+					</div>
+				</div>
+			</form>
+		</text>)
+		.FooterContent(@<text>
+			<button class="btn btn-secondary btn-flat" data-dismiss="modal">
+				<span>@T("Common.Cancel")</span>
+			</button>
+			<button id="btnCopyAttributeOptions" class="btn btn-primary" data-dismiss="modal">
+				<span>@T("Common.OK")</span>
+			</button>
+		</text>)
+		.Render();
+}

@@ -1,0 +1,52 @@
+﻿@model SmartStore.AmazonPay.Models.AmazonPayViewModel
+@{
+	Html.AddCssFileParts(true, Url.Content("~/Plugins/SmartStore.AmazonPay/Content/SmartStore.AmazonPay.css"));
+}
+
+<script type="text/javascript">
+	window.onAmazonLoginReady = function () {
+		try {
+			amazon.Login.setClientId('@Html.Raw(Model.ClientId)');
+		}
+		catch (e) {
+			console.log(e);
+		}
+	};
+
+	window.onAmazonPaymentsReady = function () {
+		try {
+			new OffAmazonPayments.Widgets.AddressBook({
+				sellerId: '@Model.SellerId',
+				amazonOrderReferenceId: '@Model.OrderReferenceId',
+				displayMode: 'Read',
+				design: {
+					designMode: 'responsive'
+				},
+				onError: function (e) {
+					console.log(e.getErrorCode() + ': ' + e.getErrorMessage());
+				}
+			}).bind('amazon-pay-read-address-book-widget');
+		}
+		catch (e) {
+			console.log(e);
+		}
+
+		try {
+			new OffAmazonPayments.Widgets.Wallet({
+				sellerId: '@Model.SellerId',
+				amazonOrderReferenceId: '@Model.OrderReferenceId',
+				displayMode: 'Read',
+				design: {
+					designMode: 'responsive'
+				},
+				onError: function (e) {
+					console.log(e.getErrorCode() + ': ' + e.getErrorMessage());
+				}
+			}).bind('amazon-pay-read-wallet-widget');
+		}
+		catch (e) {
+			console.log(e);
+		}
+	};
+</script>
+<script async="async" src="@Html.Raw(Model.WidgetUrl)"></script>

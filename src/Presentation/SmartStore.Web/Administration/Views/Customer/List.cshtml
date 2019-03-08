@@ -1,0 +1,302 @@
+﻿@model CustomerListModel
+@using Telerik.Web.Mvc.UI;
+@using System.Globalization;
+@{
+    var gridPageSize = EngineContext.Current.Resolve<SmartStore.Core.Domain.Common.AdminAreaSettings>().GridPageSize;
+    
+    ViewBag.Title = T("Admin.Customers.Customers").Text;
+}
+@using (Html.BeginForm())
+{
+    <div class="section-header">
+        <div class="title">
+            <i class="fa fa-user"></i>
+            @T("Admin.Customers.Customers")
+        </div>
+        <div class="options">
+			@{ Html.RenderWidget("admin_button_toolbar_before"); }
+
+			<button type="button" class="btn btn-outline-secondary btn-toggle-filter" data-toggle="button" aria-pressed="false">
+				<i class="fa fa-filter"></i>
+				<span>@T("Common.Filter")</span>
+				<i class="fa fa-angle-double-down"></i>
+			</button>
+
+			<a href="@Url.Action("Create")" class="btn btn-primary">
+				<i class="fa fa-plus"></i> 
+				<span>@T("Admin.Common.AddNew")</span>
+			</a>
+
+			@{ Html.RenderWidget("admin_button_toolbar_after"); }
+        </div>
+    </div>
+
+	<div class="row mt-3 grid-filter" style="display: none">
+		<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+			@Html.SmartLabelFor(model => model.SearchEmail)
+			@Html.TextBoxFor(model => Model.SearchEmail, new { @class = "form-control" })
+		</div>
+
+		@if (Model.UsernamesEnabled)
+		{
+			<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+				@Html.SmartLabelFor(model => model.SearchUsername)
+				@Html.TextBoxFor(model => Model.SearchUsername, new { @class = "form-control" })
+			</div>
+		}
+
+		<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+			@Html.SmartLabelFor(model => model.SearchFirstName)
+			@Html.TextBoxFor(model => Model.SearchFirstName, new { @class = "form-control" })
+		</div>
+		<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+			@Html.SmartLabelFor(model => model.SearchLastName)
+			@Html.TextBoxFor(model => Model.SearchLastName, new { @class = "form-control" })
+		</div>
+
+		@if (Model.DateOfBirthEnabled)
+		{
+			var monthOfBirthValues = new List<SelectListItem>();
+			for (int i = 1; i <= 12; i++)
+			{
+				monthOfBirthValues.Add(new SelectListItem { Text = i.ToString(CultureInfo.InvariantCulture), Value = i.ToString(CultureInfo.InvariantCulture) });
+			}
+
+			var dayOfBirthValues = new List<SelectListItem>();
+			for (int i = 1; i <= 31; i++)
+			{
+				dayOfBirthValues.Add(new SelectListItem { Text = i.ToString(CultureInfo.InvariantCulture), Value = i.ToString(CultureInfo.InvariantCulture) });
+			}
+
+			<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+				<div>
+					@Html.SmartLabelFor(model => model.SearchMonthOfBirth)
+				</div>
+				<div class="form-row">
+					<div class="col">
+						@Html.DropDownListFor(model => Model.SearchMonthOfBirth, monthOfBirthValues, T("Admin.Customers.Customers.List.SearchDateOfBirth.Month").Text)
+					</div>
+					<div class="col">
+						@Html.DropDownListFor(model => Model.SearchDayOfBirth, dayOfBirthValues, T("Admin.Customers.Customers.List.SearchDateOfBirth.Day").Text)
+					</div>
+				</div>
+			</div>
+		}
+
+		@if (Model.CompanyEnabled)
+		{
+			<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+				@Html.SmartLabelFor(model => model.SearchCompany)
+				@Html.TextBoxFor(model => Model.SearchCompany, new { @class = "form-control" })
+			</div>
+		}
+
+		@if (Model.PhoneEnabled)
+		{
+			<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+				@Html.SmartLabelFor(model => model.SearchPhone)
+				@Html.TextBoxFor(model => Model.SearchPhone, new { @class = "form-control" })
+			</div>
+		}
+
+		@if (Model.ZipPostalCodeEnabled)
+		{
+			<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+				@Html.SmartLabelFor(model => model.SearchZipPostalCode)
+				@Html.TextBoxFor(model => Model.SearchZipPostalCode, new { @class = "form-control" })
+			</div>
+		}
+
+		<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+			@Html.SmartLabelFor(model => model.SearchCustomerRoleIds)
+			@*@Html.DropDownListFor(model => model.SearchCustomerRoleIds, Model.AvailableCustomerRoles, null, new { multiple = "multiple", @class = "form-control" })*@
+			@Html.DropDownList("SearchCustomerRoleIds", Model.AvailableCustomerRoles, null, new { multiple = "multiple", @class = "form-control" })
+		</div>
+
+		<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+			<label>&nbsp;</label>
+			<div class="form-check form-control-plaintext">
+				@Html.CheckBoxFor(model => model.SearchDeletedOnly, new { @class = "form-check-input" })
+				<label class="form-check-label" for="SearchDeletedOnly">@Html.DisplayNameFor(model => model.SearchDeletedOnly)</label>
+			</div>	
+		</div>
+
+		<div class="col-sm-6 col-lg-4 col-xl-3 form-group ml-auto">
+			<label>&nbsp;</label>
+			<button type="submit" id="search-customers" name="search-customers" class="btn btn-warning btn-block">
+				<span>@T("Admin.Common.ApplyFilter")</span>
+			</button>
+		</div>
+	</div>
+
+
+    @(Html.Telerik().Grid<CustomerModel>(Model.Customers.Data)
+		.Name("customers-grid")
+		.ClientEvents(events => events
+			.OnDataBinding("onDataBinding")
+			.OnDataBound("onDataBound"))
+		.Columns(columns =>
+		{
+			columns.Bound(x => x.Id)
+				.Template(x => string.Format("<input type='checkbox' name='checkedRecords' value='{0}' class='checkboxGroups'/>", x.Id))
+				.ClientTemplate("<input type='checkbox' name='checkedRecords' value='<#= Id #>' class='checkboxGroups'/>")
+				.Title("<input id='mastercheckbox' type='checkbox'/>")
+				.HtmlAttributes(new { style = "text-align:center" })
+				.HeaderHtmlAttributes(new { style = "text-align:center" });
+			columns.Bound(x => x.Id);
+			columns.Bound(x => x.Email)
+				.Template(x => Html.ActionLink(x.Email, "Edit", "Customer", new { id = x.Id }, new { }))
+				.ClientTemplate("<a href=\"" + @Url.Content("~/Admin/Customer/Edit/") + "<#= Id #>\"><#= Email #></a>");
+			columns.Bound(x => x.Username)
+				.Visible(Model.UsernamesEnabled);
+			columns.Bound(x => x.FullName);
+			columns.Bound(x => x.CustomerRoleNames);
+			columns.Bound(x => x.Company)
+				.Visible(Model.CompanyEnabled);
+			columns.Bound(x => x.Phone)
+				.Visible(Model.PhoneEnabled);
+			columns.Bound(x => x.ZipPostalCode)
+				.Visible(Model.ZipPostalCodeEnabled);
+			columns.Bound(x => x.Active)
+					.Template(item => @Html.SymbolForBool(item.Active))
+					.ClientTemplate(@Html.SymbolForBool("Active"))
+					.Centered();
+			columns.Bound(x => x.CreatedOn);
+			columns.Bound(x => x.LastActivityDate);
+			columns.Bound(x => x.Id)
+				.Centered()
+				.Template(x => Html.ActionLink(T("Admin.Common.Edit").Text, "Edit", new { id = x.Id }, new { @class = "t-button" }))
+				.ClientTemplate("<a href=\"Edit/<#= Id #>\" class=\"t-button\">" + T("Admin.Common.Edit").Text + "</a>")
+				.Title(String.Empty)
+				.HtmlAttributes(new { align = "right", @class = "omega" });
+		})
+		.Pageable(settings => settings.Total(Model.Customers.Total).PageSize(gridPageSize).Position(GridPagerPosition.Both))
+		.DataBinding(dataBinding => dataBinding.Ajax().Select("CustomerList", "Customer"))
+		.PreserveGridState()
+		.EnableCustomBinding(true))
+
+    <script type="text/javascript">
+		@*used by widget SmartStore.CommonExportProviders::ExportButtonsGeneral.cshtml*@
+		var selectedIds = [];
+
+		$(document).ready(function () {
+
+			// Filter toggler
+			$('.btn-toggle-filter').on('click', function (e) {
+				$('.grid-filter').slideToggle({ duration: 200, easing: 'ease-in-out' });
+			});
+
+			//search button
+			$('#search-customers').click(function () {
+				var grid = $('#customers-grid').data('tGrid');
+				grid.currentPage = 1; //new search. Set page size to 1
+				grid.ajaxRequest();
+				return false;
+			});
+
+			$("#@Html.FieldIdFor(model => model.SearchEmail)").keydown(function (event) {
+				if (event.keyCode == 13) {
+					$("#search-customers").click();
+					return false;
+				}
+			});
+			$("#@Html.FieldIdFor(model => model.SearchUsername)").keydown(function (event) {
+				if (event.keyCode == 13) {
+					$("#search-customers").click();
+					return false;
+				}
+			});
+			$("#@Html.FieldIdFor(model => model.SearchFirstName)").keydown(function (event) {
+				if (event.keyCode == 13) {
+					$("#search-customers").click();
+					return false;
+				}
+			});
+			$("#@Html.FieldIdFor(model => model.SearchLastName)").keydown(function (event) {
+				if (event.keyCode == 13) {
+					$("#search-customers").click();
+					return false;
+				}
+			});
+			$("#@Html.FieldIdFor(model => model.SearchCompany)").keydown(function (event) {
+				if (event.keyCode == 13) {
+					$("#search-customers").click();
+					return false;
+				}
+			});
+			$("#@Html.FieldIdFor(model => model.SearchPhone)").keydown(function (event) {
+				if (event.keyCode == 13) {
+					$("#search-customers").click();
+					return false;
+				}
+			});
+			$("#@Html.FieldIdFor(model => model.SearchZipPostalCode)").keydown(function (event) {
+				if (event.keyCode == 13) {
+					$("#search-customers").click();
+					return false;
+				}
+			});
+
+			$('#mastercheckbox').click(function () {
+				$('.checkboxGroups').attr('checked', $(this).is(':checked')).change();
+			});
+
+			//wire up checkboxes.
+			$(document).on('change', '#customers-grid input[type=checkbox][id!=mastercheckbox]', function (e) {
+				var $check = $(this);
+				if ($check.is(":checked") == true) {
+					var checked = jQuery.inArray($check.val(), selectedIds);
+					if (checked == -1) {
+						//add id to selectedIds.
+						selectedIds.push($check.val());
+					}
+				}
+				else {
+					var checked = jQuery.inArray($check.val(), selectedIds);
+					if (checked > -1) {
+						//remove id from selectedIds.
+						selectedIds = $.grep(selectedIds, function (item, index) {
+							return item != $check.val();
+						});
+					}
+				}
+				updateMasterCheckbox();
+			});
+		});
+
+		function onDataBound(e) {
+
+			$('#customers-grid input[type=checkbox][id!=mastercheckbox]').each(function () {
+				var currentId = $(this).val();
+				var checked = jQuery.inArray(currentId, selectedIds);
+				//set checked based on if current checkbox's value is in selectedIds.
+				$(this).attr('checked', checked > -1);
+			});
+
+			updateMasterCheckbox();
+		}
+
+		function updateMasterCheckbox() {
+			var numChkBoxes = $('#customers-grid input[type=checkbox][id!=mastercheckbox]').length;
+			var numChkBoxesChecked = $('#customers-grid input[type=checkbox][checked][id!=mastercheckbox]').length;
+			$('#mastercheckbox').attr('checked', numChkBoxes == numChkBoxesChecked && numChkBoxes > 0);
+		}
+
+		function onDataBinding(e) {
+			var searchModel = {
+				SearchCustomerRoleIds: jQuery.makeArray($('#@Html.FieldIdFor(model => model.SearchCustomerRoleIds)').val()).join(),
+				SearchEmail: $('#@Html.FieldIdFor(model => model.SearchEmail)').val(),
+				SearchUsername: $('#@Html.FieldIdFor(model => model.SearchUsername)').val(),
+				SearchFirstName: $('#@Html.FieldIdFor(model => model.SearchFirstName)').val(),
+				SearchLastName: $('#@Html.FieldIdFor(model => model.SearchLastName)').val(),
+				SearchDayOfBirth: $('#@Html.FieldIdFor(model => model.SearchDayOfBirth)').val(),
+				SearchMonthOfBirth: $('#@Html.FieldIdFor(model => model.SearchMonthOfBirth)').val(),
+				SearchCompany: $('#@Html.FieldIdFor(model => model.SearchCompany)').val(),
+				SearchPhone: $('#@Html.FieldIdFor(model => model.SearchPhone)').val(),
+				SearchZipPostalCode: $('#@Html.FieldIdFor(model => model.SearchZipPostalCode)').val(),
+				SearchDeletedOnly: $('#@Html.FieldIdFor(model => model.SearchDeletedOnly)').prop('checked')
+			};
+			e.data = searchModel;
+		}
+    </script>
+}

@@ -1,0 +1,137 @@
+﻿@model AddressModel
+@using SmartStore.Web.Models.Common;
+
+@{ 
+	var breakpoint = (ViewData["breakpoint"] as string).NullEmpty() ?? "md";
+}
+
+@Html.HiddenFor(model => model.Id)
+
+<div class="form-horizontal">  
+    
+    @if (Model.CompanyEnabled)
+    {
+		@Html.ControlGroupFor(model => model.Company, required: Model.CompanyRequired, breakpoint: breakpoint)
+	}
+    
+    <div><hr /></div>
+
+    @if (Model.SalutationEnabled || Model.TitleEnabled)
+    {
+        <div class="form-group row">
+            @if (Model.SalutationEnabled)
+            {
+                @Html.LabelFor(model => model.Salutation, new { @class = "col-{0}-3 col-form-label".FormatInvariant(breakpoint) })
+                <div class="col-@breakpoint-3">
+                    @Html.DropDownListFor(model => model.Salutation, Model.AvailableSalutations, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Salutation)
+                </div>
+            }
+
+            @if (Model.TitleEnabled)
+            {
+                @Html.LabelFor(model => model.Title, new { @class = "col-{0}-3 col-form-label {1}".FormatInvariant(breakpoint, Model.SalutationEnabled ? " text-right" : "") })
+                <div class="col-@breakpoint-3">
+                    @Html.TextBoxFor(model => model.Title, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Title)
+                </div>
+            }
+        </div>
+    }
+
+    @Html.ControlGroupFor(model => model.FirstName, required: true, breakpoint: breakpoint)
+
+
+    @Html.ControlGroupFor(model => model.LastName, required: true, breakpoint: breakpoint)
+
+    @if (Model.StreetAddressEnabled)
+    {
+        @Html.ControlGroupFor(model => model.Address1, required: Model.StreetAddressRequired, breakpoint: breakpoint)
+	}
+
+    @if (Model.StreetAddress2Enabled)
+    {
+		@Html.ControlGroupFor(model => model.Address2, required: Model.StreetAddress2Required, breakpoint: breakpoint)
+	}
+
+	@if (Model.CityEnabled || Model.ZipPostalCodeEnabled)
+	{
+		<div class="form-group row">
+			@Html.LabelFor(model => model.City, new { @class = "col-{0}-3 col-form-label".FormatInvariant(breakpoint) + (Model.CityRequired ? " required" : "") })
+			<div class="col-@breakpoint-9">
+				<div class="row sm-gutters d-flex">
+					<div class="col">
+						@Html.TextBoxFor(model => model.City, new { placeholder = Model.CityRequired ? "" : T("Common.Optional").Text, @class = "form-control" })
+					</div>
+					@if (Model.ZipPostalCodeEnabled)
+					{
+						<div class="col col-auto">
+							@Html.LabelFor(model => model.ZipPostalCode, new { @class = "text-right col-form-label" + (Model.ZipPostalCodeRequired ? " required" : "") })
+						</div>
+						<div class="col col-auto">
+							@Html.TextBoxFor(model => model.ZipPostalCode, new { placeholder = Model.ZipPostalCodeRequired ? "" : T("Common.Optional").Text, @class = "form-control", style = "width: 6rem" })
+						</div>
+					}
+				</div>
+				@Html.ValidationMessageFor(model => model.City)
+				@Html.ValidationMessageFor(model => model.ZipPostalCode)
+			</div>
+		</div>
+	}
+
+    @if (Model.CountryEnabled)
+    {
+		var fieldPrefix = ViewData.TemplateInfo.HtmlFieldPrefix.NullEmpty() ?? "Address";
+        <div class="form-group row">
+            @Html.LabelFor(model => model.CountryId, new { @class = "col-{0}-3 col-form-label required".FormatInvariant(breakpoint) })
+            <div class="col-@breakpoint-9">
+                @Html.DropDownList("CountryId", Model.AvailableCountries,
+				new
+				{
+					@class = "form-control country-input country-selector",
+					data_region_control_selector = "#{0}_StateProvinceId".FormatInvariant(fieldPrefix),
+					data_states_ajax_url = Url.Action("GetStatesByCountryId", "Country"),
+					data_addEmptyStateIfRequired = "true"
+				})
+                @Html.ValidationMessageFor(model => model.CountryId)
+            </div>
+        </div>
+	}
+
+    @if (Model.CountryEnabled && Model.StateProvinceEnabled)
+    {
+        <div class="form-group row">
+            @Html.LabelFor(model => model.StateProvinceId, new { @class = "col-{0}-3 col-form-label".FormatInvariant(breakpoint) })
+            <div class="col-@breakpoint-9">
+                @Html.DropDownListFor(model => model.StateProvinceId, Model.AvailableStates, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.StateProvinceId)
+            </div>
+        </div>
+    }
+
+    <div><hr /></div>
+
+	@Html.ControlGroupFor(model => model.Email, required: true, breakpoint: breakpoint)
+    
+    @if (Model.ValidateEmailAddress)
+    {
+		@Html.ControlGroupFor(model => model.EmailMatch, required: true, breakpoint: breakpoint)
+	}
+    
+    @if (Model.PhoneEnabled)
+    {
+		@Html.ControlGroupFor(model => model.PhoneNumber, required: Model.PhoneRequired, breakpoint: breakpoint)
+	}
+
+    @if (Model.FaxEnabled)
+    {
+		@Html.ControlGroupFor(model => model.FaxNumber, required: Model.FaxRequired, breakpoint: breakpoint)
+	}
+
+    <div class="form-group row">
+        <div class="offset-@breakpoint-3 col-@breakpoint-9 text-muted address-required-hint">
+            @T("Address.Fields.Required.Hint")
+        </div>
+    </div>
+
+</div>

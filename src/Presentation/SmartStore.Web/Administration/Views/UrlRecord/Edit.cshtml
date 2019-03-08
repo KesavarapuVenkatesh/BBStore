@@ -1,0 +1,33 @@
+﻿@model UrlRecordModel
+@using SmartStore.Admin.Models.UrlRecord;
+@{
+	var title = string.Concat(T("Admin.Common.Edit"), " ", T("Admin.System.SeNames.Name"));
+	ViewBag.Title = title;
+}
+@using (Html.BeginForm())
+{
+    <div class="section-header">
+        <div class="title">
+            @title - @Model.Slug @Html.ActionLink("(" + T("Admin.Common.BackToList") + ")", "List")
+        </div>
+        <div class="options">
+			<a href="@Model.EntityUrl" class="btn btn-secondary">
+				<i class="fa fa-external-link"></i>&nbsp;@T("Admin.Common.Entity")
+			</a>
+            <button type="submit" name="save" value="save" class="btn btn-warning">
+				<i class="fa fa-check"></i>
+				<span>@T("Admin.Common.Save")</span>
+			</button>
+            <button type="submit" name="save" value="save-continue" class="btn btn-secondary">
+				<span>@T("Admin.Common.SaveContinue")</span>
+			</button>
+			<button type="submit" id="urlrecord-delete" name="urlrecord-delete" class="btn btn-danger">
+				<i class="fa fa-trash-o"></i>
+				<span>@T("Admin.Common.Delete")</span>
+			</button>
+        </div>
+    </div>
+
+    Html.RenderPartial("_CreateOrUpdate", Model);
+}
+@Html.DeleteConfirmation("urlrecord-delete")

@@ -1,0 +1,78 @@
+﻿@using SmartStore.Web.Models.Checkout;
+@model SmartStore.AmazonPay.Models.AmazonPayViewModel
+@{
+	Layout = "_Checkout";
+
+	Html.AddTitleParts(T("PageTitle.Checkout").Text);
+	Html.AddCssFileParts(true, Url.Content("~/Plugins/SmartStore.AmazonPay/Content/SmartStore.AmazonPay.css"));
+}
+
+@section orderProgress{
+    @{ Html.RenderAction("CheckoutProgress", "Checkout", new { step = CheckoutProgressStep.Payment, area = "" }); }
+}
+
+<div class="page payment-method-page">
+    <div class="page-title">
+        <h1 class="h3">@T("Checkout.SelectPaymentMethod")</h1>
+    </div>
+
+    <div class="page-body checkout-data">
+		@{ Html.RenderWidget("checkout_payment_method_top"); }
+
+		@using (Html.BeginForm("PaymentMethod", "AmazonPayCheckout", new { area = Model.SystemName }, FormMethod.Post))
+        {
+			<div class="amazon-pay-widget clearfix">
+				<div id="amazon-pay-wallet-widget"></div>
+			</div>
+
+            <div class="buttons mt-3">
+                <a class="btn btn-secondary btn-lg" href="@Url.Action("ShippingMethod", "Checkout", new { area = "" })">
+                    <i class="fa fa-angle-left"></i>
+                    <span>@T("Common.Back")</span>
+                </a>
+
+                <button id="AmazonPayNextCheckoutStep" type="submit" disabled="disabled" class="btn btn-warning btn-lg payment-method-next-step-button">
+                    <span>@T("Checkout.NextButton")</span>
+                    <i class="fa fa-angle-right"></i>
+                </button>
+            </div>
+			
+			Html.RenderWidget("checkout_payment_method_bottom"); 
+		}
+	</div>
+</div>
+
+<script type="text/javascript">
+	window.onAmazonLoginReady = function () {
+		try {
+			amazon.Login.setClientId('@Html.Raw(Model.ClientId)');
+		}
+		catch (e) {
+			console.log(e);
+			displayNotification(e, 'error');
+		}
+	};
+
+	window.onAmazonPaymentsReady = function () {
+		try {
+			new OffAmazonPayments.Widgets.Wallet({
+				sellerId: '@Model.SellerId',
+				scope: 'profile payments:widget payments:shipping_address payments:billing_address',
+				amazonOrderReferenceId: '@Model.OrderReferenceId',
+				design: {
+					designMode: 'responsive'
+				},
+				onPaymentSelect: function (orderReference) {
+					$('#AmazonPayNextCheckoutStep').prop('disabled', false);
+				},
+				onError: function (e) {
+					console.log(e.getErrorCode() + ': ' + e.getErrorMessage());
+				}
+			}).bind('amazon-pay-wallet-widget');
+		}
+		catch (e) {
+			console.log(e);
+		}
+	};
+</script>
+<script async="async" src="@Html.Raw(Model.WidgetUrl)"></script>

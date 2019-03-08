@@ -1,0 +1,179 @@
+﻿@model MaintenanceModel
+@{
+    ViewBag.Title = T("Admin.System.Maintenance").Text;
+}
+<div class="section-header">
+    <div class="title">
+        <i class="fa fa-cogs"></i>
+        @T("Admin.System.Maintenance")
+    </div>
+    <div class="options">
+    </div>
+</div>
+@using (Html.BeginForm())
+{
+	<table class="adminContent">
+		<tr>
+			<td colspan="2" class="admin-config-group">
+				<div class="title">@T("Admin.System.Maintenance.DeleteImageCache")</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="adminTitle">
+				@Html.SmartLabelFor(model => model.DeleteImageCache.FileCount)
+			</td>
+			<td class="adminData">
+				<div class="form-control-plaintext">
+					@Model.DeleteImageCache.FileCount
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="adminTitle">
+				@Html.SmartLabelFor(model => model.DeleteImageCache.TotalSize)
+			</td>
+			<td class="adminData">
+				<div class="form-control-plaintext">
+					@Model.DeleteImageCache.TotalSize
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="adminTitle"></td>
+			<td class="adminData">
+				<button type="submit" name="delete-image-cache" value="delete-image-cache" class="btn btn-secondary">
+					<i class="fa fa-trash-o"></i>
+					<span>@T("Admin.Header.ClearCache")</span>
+				</button>
+			</td>
+		</tr>
+	</table>
+
+	<table class="adminContent">
+		<tr>
+			<td colspan="2" class="admin-config-group">
+				<div class="title">@T("Admin.System.Maintenance.DeleteGuests")</div>
+			</td>
+		</tr>
+		@if (Model.DeleteGuests.NumberOfDeletedCustomers.HasValue)
+		{
+			<tr>
+				<td colspan="2">
+					<div class="alert alert-info">
+						@string.Format(T("Admin.System.Maintenance.DeleteGuests.TotalDeleted").Text, Model.DeleteGuests.NumberOfDeletedCustomers.Value)
+					</div>
+				</td>
+			</tr>
+		}
+		<tr>
+			<td class="adminTitle">
+				@Html.SmartLabelFor(model => model.DeleteGuests.StartDate)
+			</td>
+			<td class="adminData">
+				@Html.EditorFor(model => model.DeleteGuests.StartDate)
+			</td>
+		</tr>
+		<tr>
+			<td class="adminTitle">
+				@Html.SmartLabelFor(model => model.DeleteGuests.EndDate)
+			</td>
+			<td class="adminData">
+				@Html.EditorFor(model => Model.DeleteGuests.EndDate)
+			</td>
+		</tr>
+		<tr>
+			<td class="adminTitle">
+				@Html.SmartLabelFor(model => model.DeleteGuests.OnlyWithoutShoppingCart)
+			</td>
+			<td class="adminData">
+				@Html.EditorFor(model => Model.DeleteGuests.OnlyWithoutShoppingCart)
+			</td>
+		</tr>
+		<tr>
+			<td class="adminTitle"></td>
+			<td class="adminData">
+				<button type="submit" name="delete-guests" value="delete-guests" class="btn btn-secondary">
+					<i class="fa fa-trash-o"></i>
+					<span>@T("Admin.Common.Delete")</span>
+				</button>
+			</td>
+		</tr>
+	</table>
+
+	<table class="adminContent">
+		<tr>
+			<td colspan="2" class="admin-config-group">
+				<div class="title">@T("Admin.System.Maintenance.DeleteExportedFiles")</div>
+			</td>
+		</tr>
+		@if (Model.DeleteExportedFiles.NumberOfDeletedFiles.HasValue || Model.DeleteExportedFiles.NumberOfDeletedFolders.HasValue)
+		{
+			<tr>
+				<td colspan="2">
+					<div class="alert alert-info">
+						@if (Model.DeleteExportedFiles.NumberOfDeletedFiles.HasValue)
+						{
+							<div>@T("Admin.Common.FilesDeleted", Model.DeleteExportedFiles.NumberOfDeletedFiles.Value).</div>
+						}
+						@if (Model.DeleteExportedFiles.NumberOfDeletedFolders.HasValue)
+						{
+							<div>@T("Admin.Common.FoldersDeleted", Model.DeleteExportedFiles.NumberOfDeletedFolders.Value).</div>
+						}
+					</div>
+				</td>
+			</tr>
+		}
+		<tr>
+			<td class="adminTitle">
+				@Html.SmartLabelFor(model => model.DeleteExportedFiles.StartDate)
+			</td>
+			<td class="adminData">
+				@Html.EditorFor(model => model.DeleteExportedFiles.StartDate)
+			</td>
+		</tr>
+		<tr>
+			<td class="adminTitle">
+				@Html.SmartLabelFor(model => model.DeleteExportedFiles.EndDate)
+			</td>
+			<td class="adminData">
+				@Html.EditorFor(model => Model.DeleteExportedFiles.EndDate)
+			</td>
+		</tr>
+		<tr>
+			<td class="adminTitle"></td>
+			<td class="adminData">
+				<button type="submit" name="delete-exported-files" value="delete-exported-files" class="btn btn-danger" onclick='return confirm(@T("Admin.Common.AreYouSure").JsText);'>
+					<i class="fa fa-trash-o"></i>
+					<span>@T("Admin.Common.Delete")</span>
+				</button>
+			</td>
+		</tr>
+	</table>
+
+	<table class="adminContent">
+		<tr>
+			<td colspan="2" class="admin-config-group">
+				<div class="title">@T("Admin.System.Maintenance.SqlQueryTitle")</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="adminTitle">
+				@Html.SmartLabelFor(model => model.SqlQuery)
+			</td>
+			<td class="adminData">
+				@Html.TextAreaFor(model => model.SqlQuery, new { style = "height:250px;" })
+			</td>
+		</tr>
+
+		<tr>
+			<td class="adminTitle"></td>
+			<td class="adminData">
+				<button type="submit" name="execute-sql-query" value="execute-sql-query" class="btn btn-danger">
+					<i class="fa fa-bolt"></i>
+					@T("Admin.System.Maintenance.SqlQueryExecute")
+				</button>
+			</td>
+		</tr>
+	</table>
+
+}

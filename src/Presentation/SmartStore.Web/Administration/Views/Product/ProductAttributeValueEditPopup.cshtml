@@ -1,0 +1,21 @@
+﻿@model ProductModel.ProductVariantAttributeValueModel
+@{
+    Layout = "_AdminPopupLayout";
+    ViewBag.Title = T("Admin.Catalog.Products.ProductVariantAttributes.Attributes.Values.EditValueDetails").Text;
+}
+@using (Html.BeginForm())
+{
+    <div class="section-header">
+        <div class="title">
+            @T("Admin.Catalog.Products.ProductVariantAttributes.Attributes.Values.EditValueDetails")
+        </div>
+        <div class="options">
+            <button type="submit" name="save" value="save" class="btn btn-warning">
+                <i class="fa fa-check"></i>
+                <span>@T("Admin.Common.Save")</span>
+            </button>
+        </div>
+    </div>
+
+    Html.RenderPartial("_CreateOrUpdateProductAttributeValue", Model);
+}

@@ -1,0 +1,74 @@
+﻿@model SmartStore.OfflinePayment.Models.ManualConfigurationModel
+@using SmartStore.Web.Framework;
+@{
+	Layout = "";
+}
+
+@{ Html.RenderAction("StoreScopeConfiguration", "Setting", new { area = "Admin" }); }
+
+@using (Html.BeginForm())
+{
+	<div class="plugin-actions">
+		<button type="submit" id="save" name="save" class="btn btn-warning" value="save">
+			<i class="fa fa-check"></i>
+			<span>@T("Admin.Common.Save")</span>
+		</button>
+	</div>
+
+	<table class="adminContent">
+		<tr>
+			<td class="adminTitle">
+				@Html.SmartLabelFor(model => model.DescriptionText)
+			</td>
+			<td class="adminData">
+				@Html.SettingEditorFor(model => model.DescriptionText, Html.TextAreaFor(model => model.DescriptionText, new { style = "height: 100px;" }))
+				@Html.ValidationMessageFor(model => model.DescriptionText)
+			</td>
+		</tr>
+		<tr>
+			<td class="adminTitle">
+				@Html.SmartLabelFor(model => model.PaymentMethodLogo)
+			</td>
+			<td class="adminData">
+				@Html.SettingEditorFor(model => model.PaymentMethodLogo, Html.EditorFor(m => m.PaymentMethodLogo, "Picture", new { transientUpload = true, validate = true }))
+				@Html.ValidationMessageFor(model => model.PaymentMethodLogo)
+			</td>
+		</tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.TransactMode)
+            </td>
+            <td class="adminData">
+				@Html.SettingEditorFor(model => model.TransactMode, Html.DropDownListFor(model => model.TransactMode, Model.TransactModeValues))
+            </td>
+        </tr>
+		<tr>
+			<td class="adminTitle">
+				@Html.SmartLabelFor(model => model.ExcludedCreditCards)
+			</td>
+			<td class="adminData">
+				@Html.SettingEditorFor(model => model.ExcludedCreditCards, 
+					Html.ListBoxFor(model => model.ExcludedCreditCards, Model.AvailableCreditCards, new { multiple = "multiple", data_tags = "true" }))
+				@Html.ValidationMessageFor(model => model.ExcludedCreditCards)
+			</td>
+		</tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.AdditionalFee)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.AdditionalFee, null, new { postfix = Model.PrimaryStoreCurrencyCode })
+                @Html.ValidationMessageFor(model => model.AdditionalFee)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.AdditionalFeePercentage)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.AdditionalFeePercentage)
+                @Html.ValidationMessageFor(model => model.AdditionalFeePercentage)
+            </td>
+        </tr>
+    </table>
+}

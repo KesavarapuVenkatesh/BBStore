@@ -1,0 +1,110 @@
+/// <reference path="../../../Content/shared/_variables-shared.scss" />
+/// <reference path="../../../Content/shared/_mixins.scss" />
+/// <reference path="_variables.scss" />
+/// <reference path="../../../Content/bs4/scss/bootstrap.scss" />
+
+//
+// Brands
+// -------------------------------------------------
+
+.manufacturer-list-title {
+    font-weight: bold;
+    padding-bottom: 0.5rem;
+}
+
+.manufacturer-nav {
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 2rem;
+
+    .navbar {
+        padding: 0;
+        margin-bottom: .5rem;
+
+        .nav-item {
+            margin: 0 1rem;
+        }
+        .nav-link {
+            font-size: 1.25rem;
+            padding: 0;
+        }
+    }
+}
+
+
+//
+// Cookie Consent
+// -------------------------------------------------
+.cookie-consent-panel-message {
+    background: $gray-800;
+	z-index: $zindex-fixed + 1;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	margin: 0;
+	padding: 10px 20px;
+	color: #fff;
+	text-shadow: 0px 1px 0px #666;
+	border-top: 1px solid #222;
+	text-align: center;
+	line-height: 2;
+}
+.cookie-consent-panel-message .close {
+    color: #fff !important;
+}
+.cookie-consent-panel-message a {
+	color: inherit;
+	text-decoration: underline;
+}
+.cookie-consent-panel-message .popup {
+	display: none !important;
+}
+
+//
+// File Upload
+// -------------------------------------------------
+
+// overwrite for bluimp file upload control
+.fileupload .fileupload-progress.collapse {
+    display: none !important; 
+    width: 100%;
+}
+.fileupload .fileupload-progress.collapse.show {
+    display: block !important; 
+}
+
+
+//
+// Other stuff
+// -------------------------------------------------
+
+#iframe-backinstocksubsription {
+    max-width: 100%;
+}
+
+.pm-unread {
+	font-weight: bold;
+	background: $gray-100;
+}
+
+
+//
+// Hacks
+// -------------------------------------------------
+.ie11 {
+    .pd-offer-actions .col,
+    .offcanvas-cart-footer-row .col {
+        width: auto;
+        -ms-flex-preferred-size: auto;
+    }
+    .megamenu-dropdown-container.simple {
+        position: static;
+    }
+    .instasearch-button {
+        height: 100%;
+    }
+}
+.edge .offcanvas-cart-footer-col.d-flex {
+    display: -webkit-box !important;
+    display: -ms-flexbox !important;
+}

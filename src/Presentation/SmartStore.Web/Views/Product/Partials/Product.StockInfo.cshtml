@@ -1,0 +1,68 @@
+﻿@model ProductDetailsModel
+
+@using SmartStore.Web.Models.Catalog;
+@using SmartStore.Core.Domain.Catalog;
+
+@{
+    var isBundleItem = Model.IsBundlePart;
+
+    var displayStock = Model.StockAvailability.HasValue();
+    // Never show delivery time when product is out of stock AND stock is displayed
+    var displayDeliveryTime = !isBundleItem && (Model.DisplayDeliveryTime && Model.IsShipEnabled) && (!displayStock || (displayStock && Model.IsAvailable));
+
+    var showAttrs = displayDeliveryTime || displayStock || Model.DisplayBackInStockSubscription;
+    if (!showAttrs)
+    {
+        return;
+    }
+
+    var statusLabel = Model.DisplayDeliveryTimeAccordingToStock ? Model.DeliveryTimeName : Model.StockAvailability;
+    var statusColor = Model.DisplayDeliveryTimeAccordingToStock && !displayStock ? Model.DeliveryTimeHexValue : "";
+}
+
+<div class="pd-stock-info@(isBundleItem ? "" : " pd-group")">
+	@if (displayStock)
+	{
+		if (!isBundleItem)
+		{
+			<meta itemprop="availability" content="http://schema.org/@(Model.IsAvailable ? "InStock" : "OutOfStock")" />
+		}
+		<div class="pd-stock @(Model.IsAvailable ? "pd-instock" : "pd-outofstock")">@Model.StockAvailability</div>
+	}
+
+	@if (displayDeliveryTime)
+	{
+		<div class="deliverytime-group d-flex">
+			<span>@T("Products.DeliveryTime")</span>
+			<span class="delivery-time" title="@T("Products.DeliveryTime") @statusLabel" @Html.Attr("style", "color: " + statusColor, statusColor.HasValue())>
+				<i class="fa fa-circle delivery-time-status" style="color: @Model.DeliveryTimeHexValue"></i>
+				@statusLabel
+			</span>
+		</div>
+	}
+
+	@if (Model.DisplayBackInStockSubscription)
+	{
+		<div class="pd-stocksub">
+			@if (!Model.IsCurrentCustomerRegistered)
+			{
+				<a href='@Url.RouteUrl("Login", new { ReturnUrl = Request.RawUrl })' rel="nofollow">@T("BackInStockSubscriptions.NotifyMeWhenAvailable")</a>
+			}
+			else
+			{
+				<a class="stock-subscriber" data-toggle="modal" href="@Url.Action("BackInStockSubscribe", new { id = @Model.Id })" rel="nofollow">
+					@T("BackInStockSubscriptions.NotifyMeWhenAvailable")
+				</a>
+				<script>
+					$(function () {
+						$("a.stock-subscriber").on('click', function (e) {
+							e.preventDefault();
+							openPopup({ url: $(this).attr('href'), large: false, flex: false });
+							return false;
+						});
+					});
+				</script>
+			}
+		</div>
+	}
+</div>

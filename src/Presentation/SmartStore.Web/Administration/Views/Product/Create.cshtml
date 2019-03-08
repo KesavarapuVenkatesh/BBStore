@@ -1,0 +1,24 @@
+﻿@model ProductModel
+@{
+    ViewBag.Title = T("Admin.Catalog.Products.AddNew").Text;
+}
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "product-form" }))
+{
+    <div class="section-header">
+        <div class="title">
+            @T("Admin.Catalog.Products.AddNew") 
+			<a href='@Url.Action("List")'>(@T("Admin.Catalog.Products.BackToList"))</a>
+        </div>
+        <div class="options">
+            <button type="submit" name="save" value="save" class="btn btn-primary entity-commit-trigger" data-commit-type="product" data-commit-action="insert" data-commit-id="@Model.Id">
+                <i class="fa fa-check"></i>
+                <span>@T("Admin.Common.Save")</span>
+            </button>
+            <button type="submit" name="save" value="save-continue" class="btn btn-secondary entity-commit-trigger" data-commit-type="product" data-commit-action="insert" data-commit-id="@Model.Id">
+                <span>@T("Admin.Common.SaveContinue")</span>
+            </button>
+        </div>
+    </div>
+
+    Html.RenderPartial("_CreateOrUpdate", Model);
+}

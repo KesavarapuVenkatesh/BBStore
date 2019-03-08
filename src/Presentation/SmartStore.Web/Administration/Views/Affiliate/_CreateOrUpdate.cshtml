@@ -1,0 +1,119 @@
+﻿@model AffiliateModel
+
+@using Telerik.Web.Mvc.UI;
+
+@Html.ValidationSummary(false)
+@Html.HiddenFor(model => model.Id)
+@Html.SmartStore().TabStrip().Name("affiliate-edit").Style(TabsStyle.Material).Items(x =>
+{
+    x.Add().Text(T("Admin.Affiliates.Info").Text)
+		.Content(TabInfo()).Selected(true);
+
+    if (Model.Id > 0)
+    {
+        x.Add().Text(T("Admin.Affiliates.Customers").Text)
+			.Content(TabCustomers());
+        x.Add().Text(T("Admin.Affiliates.Orders").Text)
+			.Content(TabOrders());
+    }
+    
+    // generate an event
+    EngineContext.Current.Resolve<IEventPublisher>().Publish(new TabStripCreated(x, "affiliate-edit", this.Html, this.Model));
+})
+
+@helper TabInfo()
+{        
+    <table class="adminContent">
+        @if (Model.Id > 0)
+        {
+            <tr>
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.Id)
+                </td>
+                <td class="adminData">
+                    @Html.TextBoxFor(model => model.Id, new { @readonly = "readonly", @class = "form-control-plaintext" })
+					@Html.ValidationMessageFor(model => model.Id)
+                </td>
+            </tr>
+            <tr>
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.Url)
+                </td>
+                <td class="adminData">
+					<div class="form-control-plaintext">
+						<a href="@Model.Url">@Model.Url</a>
+					</div>
+                </td>
+            </tr>
+        }
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.Active)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.Active)
+                @Html.ValidationMessageFor(model => model.Active)
+            </td>
+        </tr>
+    </table>
+        
+    @Html.EditorFor(model => model.Address, "Address")
+}
+
+@helper TabCustomers()
+{
+    @(Html.Telerik().Grid<AffiliateModel.AffiliatedCustomerModel>()
+		.Name("customers-grid")
+		.DataKeys(keys =>
+		{
+			keys.Add(x => x.Id);
+		})
+		.Columns(columns =>
+		{
+			columns.Bound(x => x.Id);
+			columns.Bound(x => x.Email)
+				.Template(x => Html.ActionLink(x.Email, "Edit", "Customer", new { id = x.Id }, new { }))
+				.ClientTemplate("<a href=\"" + @Url.Content("~/Admin/Customer/Edit/") + "<#= Id #>\"><#= Email #></a>");
+			columns.Bound(x => x.Username)
+				.Visible(Model.UsernamesEnabled);
+			columns.Bound(x => x.FullName);
+			columns.Bound(x => x.Id)
+				.Template(x => Html.ActionLink(T("Admin.Common.View").Text, "Edit", "Customer", new { id = x.Id, @class = "t-button t-grid-edit" }, new { }))
+				.ClientTemplate("<a href=\"" + @Url.Content("~/Admin/Customer/Edit/") + "<#= Id #>\" class=\"t-button t-grid-edit\">" + T("Admin.Common.View").Text + "</a>")
+				.Title(String.Empty)
+				.HtmlAttributes(new { align = "right" });
+		})
+		.DataBinding(dataBinding =>
+		{
+			dataBinding.Ajax().Select("AffiliatedCustomerList", "Affiliate", new { affiliateId = Model.Id });
+			dataBinding.Ajax().Update("Edit", "Customer", new { id = 0 });
+		})
+		.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+		.PreserveGridState()
+		.EnableCustomBinding(true))
+}
+
+@helper TabOrders()
+{
+    @(Html.Telerik().Grid<AffiliateModel.AffiliatedOrderModel>()
+		.Name("order-grid")
+		.Columns(columns =>
+		{
+			columns.Bound(x => x.Id)
+				.Template(x => Html.ActionLink(x.Id.ToString(), "Edit", "Order", new { id = x.Id }, new { }))
+				.ClientTemplate("<a href=\"" + @Url.Content("~/Admin/Order/Edit/") + "<#= Id #>\"><#= Id #></a>");
+			columns.Bound(x => x.OrderStatus);
+			columns.Bound(x => x.PaymentStatus);
+			columns.Bound(x => x.ShippingStatus);
+			columns.Bound(x => x.CreatedOn);
+			columns.Bound(x => x.OrderTotal)
+				.RightAlign();
+		})
+		.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+		.DataBinding(dataBinding =>
+		{
+			dataBinding.Ajax().Select("AffiliatedOrderList", "Affiliate", new { affiliateId = Model.Id });
+		})
+		.PreserveGridState()
+		.EnableCustomBinding(true))
+}

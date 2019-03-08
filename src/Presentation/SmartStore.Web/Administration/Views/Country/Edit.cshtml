@@ -1,0 +1,30 @@
+﻿@model CountryModel
+@{
+    //page title
+    ViewBag.Title = T("Admin.Configuration.Countries.EditCountryDetails").Text;
+}
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "country-form" }))
+{
+    <div class="section-header">
+        <div class="title">
+            @T("Admin.Configuration.Countries.EditCountryDetails") - @Model.Name @Html.ActionLink("(" + T("Admin.Configuration.Countries.BackToList") + ")", "List")
+        </div>
+        <div class="options">
+            <button type="submit" name="save" value="save" class="btn btn-warning">
+				<i class="fa fa-check"></i>
+				<span>@T("Admin.Common.Save")</span>
+			</button>
+            <button type="submit" name="save" value="save-continue" class="btn btn-secondary">
+				<span>@T("Admin.Common.SaveContinue")</span>
+			</button>
+            <span id="country-delete" class="btn btn-danger">
+				<i class="fa fa-trash-o"></i>
+				<span>@T("Admin.Common.Delete")</span>
+			</span>
+        </div>
+    </div>
+
+    Html.RenderPartial("_CreateOrUpdate", Model);
+}
+
+@Html.DeleteConfirmation("country-delete")

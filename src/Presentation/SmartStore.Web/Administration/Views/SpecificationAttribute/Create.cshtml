@@ -1,0 +1,23 @@
+﻿@model SpecificationAttributeModel
+@{    
+    ViewBag.Title = T("Admin.Catalog.Attributes.SpecificationAttributes.AddNew").Text;
+}
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "specificationattribute-form" }))
+{
+    <div class="section-header">
+        <div class="title">
+            @T("Admin.Catalog.Attributes.SpecificationAttributes.AddNew") @Html.ActionLink("(" + T("Admin.Catalog.Attributes.SpecificationAttributes.BackToList") + ")", "List")
+        </div>
+        <div class="options">
+            <button type="submit" name="save" value="save" class="btn btn-warning">
+				<i class="fa fa-check"></i>
+				<span>@T("Admin.Common.Save")</span>
+			</button>
+            <button type="submit" name="save" value="save-continue" class="btn btn-secondary">
+				<span>@T("Admin.Common.SaveContinue")</span>
+			</button>
+        </div>
+    </div>
+
+    Html.RenderPartial("_CreateOrUpdate", Model);
+}

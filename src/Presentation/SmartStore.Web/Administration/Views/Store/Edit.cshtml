@@ -1,0 +1,29 @@
+﻿@model StoreModel
+@{
+    ViewBag.Title = T("Admin.Configuration.Stores.EditStoreDetails").Text;
+}
+
+@using (Html.BeginForm())
+{
+    <div class="section-header">
+        <div class="title">
+            @T("Admin.Configuration.Stores.EditStoreDetails") - @Model.Name @Html.ActionLink("(" + T("Admin.Configuration.Stores.BackToList") + ")", "List")
+        </div>
+        <div class="options">
+			<button type="submit" name="save" value="save" class="btn btn-warning">
+				<i class="fa fa-check"></i>
+				<span>@T("Admin.Common.Save")</span>
+			</button>
+            <button type="submit" name="save" value="save-continue" class="btn btn-secondary">
+				<span>@T("Admin.Common.SaveContinue")</span>
+			</button>
+			<button type="submit" name ="store-delete" id="store-delete" value="store-delete" class="btn btn-danger">
+				<i class="fa fa-trash-o"></i>
+				<span>@T("Admin.Common.Delete")</span>
+			</button>
+        </div>
+    </div>
+
+    Html.RenderPartial("_CreateOrUpdate", Model);
+}
+@Html.DeleteConfirmation("store-delete")

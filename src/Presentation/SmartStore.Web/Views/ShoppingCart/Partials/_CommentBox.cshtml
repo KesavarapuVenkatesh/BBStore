@@ -1,0 +1,11 @@
+﻿@model ShoppingCartModel
+@using SmartStore.Web.Models.ShoppingCart;
+
+<div class="comment-box card mb-3">
+    <div class="card-header h5">
+        @T("ShoppingCart.CommentBox")
+    </div>
+    <div class="card-body">
+        @Html.TextAreaFor(model => model.CustomerComment, new { placeholder = T("Common.Optional"), @class = "form-control" })
+    </div>
+</div>

@@ -1,0 +1,104 @@
+﻿@using SmartStore.Web.Models.Checkout;
+@using SmartStore.AmazonPay;
+@model SmartStore.AmazonPay.Models.AmazonPayViewModel
+@{
+	Layout = "_Checkout";
+
+	Html.AddTitleParts(T("PageTitle.Checkout").Text);
+	Html.AddCssFileParts(true, Url.Content("~/Plugins/SmartStore.AmazonPay/Content/SmartStore.AmazonPay.css"));
+}
+
+@section orderProgress{
+    @{ Html.RenderAction("CheckoutProgress", "Checkout", new { step = CheckoutProgressStep.Address, area = "" }); }
+}
+
+<div class="page shipping-address-page">
+    <div class="page-title">
+        <h1 class="h3">@T("Checkout.ShippingAddress")</h1>
+    </div>
+
+    <div class="page-body checkout-data">
+		@{ Html.RenderWidget("checkout_shipping_address_top"); }
+
+		@if (Model.Warning.HasValue())
+        {
+			<div class="alert alert-info">@Model.Warning</div>
+        }
+
+		<div class="amazon-pay-widget clearfix">
+			<div id="amazon-pay-address-book-widget"></div>
+		</div>
+
+		@{ Html.RenderWidget("checkout_shipping_address_middle"); }
+
+		<div class="buttons mt-3">
+			<a class="btn btn-secondary btn-lg" href="@Url.Action("Cart", "ShoppingCart", new { area = "" })">
+				<i class="fa fa-angle-left"></i>
+                <span>@T("Common.Back")</span>
+			</a>
+
+			<a id="AmazonPayNextCheckoutStep" href="@Url.Action("ShippingMethod", "Checkout", new { area = "" })" aria-disabled="true"
+			   class="btn btn-warning btn-lg new-address-next-step-button disabled">
+				<span>@T("Checkout.NextButton")</span>
+                <i class="fa fa-angle-right"></i>
+			</a>
+		</div>
+
+		@{ Html.RenderWidget("checkout_shipping_address_bottom"); }
+	</div>
+</div>
+
+<script type="text/javascript">
+	window.onAmazonLoginReady = function() {
+		try {
+			amazon.Login.setClientId('@Html.Raw(Model.ClientId)');
+		}
+		catch (e) {
+			console.log(e);
+			displayNotification(e, 'error');
+		}
+	};
+
+	window.onAmazonPaymentsReady = function () {
+		try {
+			new OffAmazonPayments.Widgets.AddressBook({
+				sellerId: '@Model.SellerId',
+				scope: 'payments:shipping_address payments:billing_address',
+				onOrderReferenceCreate: function (orderReference) {
+					var orderReferenceId = orderReference.getAmazonOrderReferenceId();
+					if (orderReferenceId !== '@Model.OrderReferenceId.EmptyNull()') {
+						$.ajax({
+							cache: false,
+							type: 'POST',
+							data: {	"orderReferenceId": orderReferenceId },
+							url: '@Url.Action("OrderReferenceCreated", "AmazonPayCheckout", new { area = AmazonPayPlugin.SystemName })',
+							success: function (response) {
+								if (!response.success) {
+									displayNotification(response.error, 'error');
+								}
+							},
+							error: function (objXml) {
+								if (objXml != null && objXml.responseText != null && objXml.responseText !== '') {
+									displayNotification(objXml.responseText, 'error');
+								}
+							}
+						});
+					}
+				},
+				onAddressSelect: function (orderReference) {
+					$('#AmazonPayNextCheckoutStep').removeClass('disabled');
+				},
+				design: {
+					designMode: 'responsive'
+				},
+				onError: function (e) {
+					console.log(e.getErrorCode() + ': ' + e.getErrorMessage());
+				}
+			}).bind('amazon-pay-address-book-widget');
+		}
+		catch (e) {
+			console.log(e);
+		}
+	};
+</script>
+<script async="async" src="@Html.Raw(Model.WidgetUrl)"></script>

@@ -1,0 +1,232 @@
+﻿@model CheckoutAttributeModel
+@using SmartStore.Core.Domain.Catalog;
+@using Telerik.Web.Mvc.UI;
+
+@Html.ValidationSummary(false)
+@Html.HiddenFor(model => model.Id)
+
+@Html.SmartStore().TabStrip().Name("checkoutattribute-edit").Style(TabsStyle.Material).Items(x =>
+{
+	x.Add().Text(T("Admin.Catalog.Attributes.CheckoutAttributes.Info").Text).Content(TabInfo()).Selected(true);
+	x.Add().Text(T("Admin.Catalog.Attributes.CheckoutAttributes.Values").Text).Content(TabValues());
+	x.Add().Text(T("Admin.Common.Stores").Text).Content(TabStores());
+
+	EngineContext.Current.Resolve<IEventPublisher>().Publish(new TabStripCreated(x, "checkoutattribute-edit", this.Html, this.Model));
+})
+
+@helper TabInfo()
+{
+    @(Html.LocalizedEditor<CheckoutAttributeModel, CheckoutAttributeLocalizedModel>("checkoutattribute-localized",
+    @<table class="adminContent">
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.Locales[item].Name)
+            </td>
+            <td class="adminData">
+				@*IMPORTANT: Do not delete, this hidden element contains the id to assign localized values to the corresponding language *@
+				@Html.HiddenFor(model => model.Locales[item].LanguageId)
+
+                @Html.EditorFor(model => Model.Locales[item].Name)
+                @Html.ValidationMessageFor(model => model.Locales[item].Name)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.Locales[item].TextPrompt)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => Model.Locales[item].TextPrompt)
+                @Html.ValidationMessageFor(model => model.Locales[item].TextPrompt)
+            </td>
+        </tr>
+    </table>
+    ,
+    @<table class="adminContent">
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.Name)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.Name)
+                @Html.ValidationMessageFor(model => model.Name)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.TextPrompt)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.TextPrompt)
+                @Html.ValidationMessageFor(model => model.TextPrompt)
+            </td>
+        </tr>
+    </table>
+    ))
+
+    <table class="adminContent">
+		<tr>
+			<td class="adminTitle">
+				@Html.SmartLabelFor(model => model.IsActive)
+			</td>
+			<td class="adminData">
+				@Html.EditorFor(model => model.IsActive)
+				@Html.ValidationMessageFor(model => model.IsActive)
+			</td>
+		</tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.IsRequired)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.IsRequired)
+                @Html.ValidationMessageFor(model => model.IsRequired)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.ShippableProductRequired)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.ShippableProductRequired)
+                @Html.ValidationMessageFor(model => model.ShippableProductRequired)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.IsTaxExempt)
+            </td>
+            <td class="adminData">
+                @Html.CheckBoxFor(model => model.IsTaxExempt, new { data_toggler_for = "#pnlTaxCategory" })
+                @Html.ValidationMessageFor(model => model.IsTaxExempt)
+            </td>
+        </tr>
+		<tbody id="pnlTaxCategory">
+			<tr id="pnlTaxCategory">
+				<td class="adminTitle">
+					@Html.SmartLabelFor(model => model.TaxCategoryId)
+				</td>
+				<td class="adminData">
+					@Html.DropDownListFor(model => model.TaxCategoryId, Model.AvailableTaxCategories, T("Common.PleaseSelect").Text)
+					@Html.ValidationMessageFor(model => model.TaxCategoryId)
+				</td>
+			</tr>
+		</tbody>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.AttributeControlTypeId)
+            </td>
+            <td class="adminData">
+                @Html.DropDownListFor(model => model.AttributeControlTypeId, ((AttributeControlType)Model.AttributeControlTypeId).ToSelectList())
+                @Html.ValidationMessageFor(model => model.AttributeControlTypeId)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.DisplayOrder)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.DisplayOrder)
+                @Html.ValidationMessageFor(model => model.DisplayOrder)
+            </td>
+        </tr>
+    </table>
+}
+
+@helper TabValues()
+{
+	if (Model.Id > 0)
+	{
+		/*
+		 * TODO: display the following warning if values are not supported by selected attribute control type
+		 * Values are not required for this attribute control type'
+		*/
+
+		<div>
+			@(Html.Telerik().Grid<CheckoutAttributeValueModel>()
+				.Name("checkoutattributevalues-grid")
+					.DataKeys(x =>
+					{
+						x.Add(y => y.Id).RouteKey("valueId");
+						x.Add(y => y.CheckoutAttributeId).RouteKey("checkoutAttributeId");
+					})
+					.Columns(columns =>
+					{
+						columns.Bound(x => x.Name);
+						columns.Bound(x => x.PriceAdjustment)
+							.Format("{0:0.00}")
+							.RightAlign()
+							.Width(200);
+						columns.Bound(x => x.WeightAdjustment)
+							.Format("{0:0.00}")
+							.Centered()
+							.Width(200);
+						columns.Bound(x => x.IsPreSelected)
+							.Width(140)
+							.Template(item => @Html.SymbolForBool(item.IsPreSelected))
+							.ClientTemplate(@Html.SymbolForBool("IsPreSelected"))
+							.Centered();
+						columns.Bound(x => x.DisplayOrder)
+							.Width(140)
+							.Centered();
+						columns.Command(commands =>
+						{
+							commands.Custom("edit-attr-value").Text(T("Common.Edit"));
+							commands.Delete().Localize(T);
+						})
+						.HtmlAttributes(new { align = "right" })
+						.Width(120);
+					})
+					.ToolBar(commands => commands.Template(CheckoutAttributeGridCommands))
+					.DataBinding(dataBinding =>
+						dataBinding.Ajax().Select("ValueList", "CheckoutAttribute", new { checkoutAttributeId = Model.Id })
+						.Delete("ValueDelete", "CheckoutAttribute"))
+					.EnableCustomBinding(true))
+		</div>
+
+		<script type="text/javascript">
+			$(document).ready(function () {
+
+				$("#btnAddNewValue").on("click", function (e) {
+					openPopup('@(Url.Action("ValueCreatePopup", "CheckoutAttribute", new { checkoutAttributeId = Model.Id, btnId = "btnRefresh", formId = "checkoutattribute-form" }))');
+					return false;
+				});
+
+				$('#btnRefresh').on("click", function () {
+					var valuesGrid = $("#checkoutattributevalues-grid");
+					valuesGrid.data('tGrid').ajaxRequest();
+					return false;
+				});
+
+				$('#checkoutattributevalues-grid').on('click', '.t-grid-edit-attr-value', function (e) {
+					e.preventDefault();
+					var grid = $('#checkoutattributevalues-grid').data('tGrid');
+					var tr = $(this).closest('tr');
+					var id = grid.dataItem(tr).Id;
+					var href = '@Url.Content("~/Admin/CheckoutAttribute/ValueEditPopup/")' + id + '?btnId=btnRefresh&formId=checkoutattribute-form';
+
+					openPopup(href);
+
+					return false;
+				});
+			});
+		</script>
+	}
+	else
+	{
+        @T("Admin.Catalog.Attributes.CheckoutAttributes.Values.SaveBeforeEdit")
+    }
+}
+
+@helper CheckoutAttributeGridCommands(Grid<CheckoutAttributeValueModel> grid)
+{
+	<button type="button" id="btnAddNewValue" name="btnAddNewValue" class="t-button t-grid-add">
+		<i class="fa fa-plus"></i>
+		<span>@T("Admin.Catalog.Attributes.CheckoutAttributes.Values.AddNew")</span>
+	</button>
+	<input type="submit" id="btnRefresh" name="btnRefresh" class="d-none" />
+}
+
+@helper TabStores()
+{
+	@Html.Partial("StoreSelector", Model)
+}

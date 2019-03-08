@@ -1,0 +1,283 @@
+﻿@model TopicModel
+@using Telerik.Web.Mvc.UI;
+
+@Html.ValidationSummary(false)
+@Html.HiddenFor(model => model.Id)
+@Html.SmartStore().TabStrip().Name("topic-edit").Style(TabsStyle.Material).Items(x =>
+{
+    x.Add().Text(T("Admin.ContentManagement.Topics.Info").Text).Content(TabInfo()).Selected(true);
+    x.Add().Text(T("Admin.Common.SEO").Text).Content(TabSeo());
+	x.Add().Text(T("Admin.Common.Stores").Text).Content(TabStores());
+    
+    //generate an event
+    EngineContext.Current.Resolve<IEventPublisher>().Publish(new TabStripCreated(x, "topic-edit", this.Html, this.Model));
+})
+
+@helper TabInfo()
+{ 
+    <table class="adminContent">
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.SystemName)
+            </td>
+            <td class="adminData">
+				@Html.TextBoxFor(model => model.SystemName, Model.IsSystemTopic ? new { @readonly = "readonly" } : null )
+                @Html.ValidationMessageFor(model => model.SystemName)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.IsPasswordProtected)
+            </td>
+            <td class="adminData">
+                @Html.CheckBoxFor(model => model.IsPasswordProtected, new { data_toggler_for = "#pnlPasswordEnabled" })
+                @Html.ValidationMessageFor(model => model.IsPasswordProtected)
+            </td>
+        </tr>
+        <tr id="pnlPasswordEnabled">
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.Password)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.Password)
+                @Html.ValidationMessageFor(model => model.Password)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.IncludeInSitemap)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(x => x.IncludeInSitemap)
+                @Html.ValidationMessageFor(model => model.IncludeInSitemap)
+            </td>
+        </tr>
+        @if (Model.Id > 0)
+        {
+            <tr>
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.Url)
+                </td>
+                <td class="adminData">
+					<div class="form-control-plaintext">
+						<a href="@Model.Url">@Model.Url</a>
+					</div>
+                </td>
+            </tr>
+        }
+        <tr>
+            <td colspan="2">
+                <hr />
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.RenderAsWidget)
+            </td>
+            <td class="adminData">
+				@Html.CheckBoxFor(model => model.RenderAsWidget, new { data_toggler_for = "#pnlRenderAsWidget" })
+                @Html.ValidationMessageFor(model => model.RenderAsWidget)
+            </td>
+        </tr>
+
+		<tbody id="pnlRenderAsWidget">
+			<tr>
+				<td class="adminTitle">
+					@Html.SmartLabelFor(model => model.WidgetZone)
+				</td>
+				<td class="adminData">
+					@Html.EditorFor(model => model.WidgetZone, "WidgetZone")
+					@Html.ValidationMessageFor(model => model.WidgetZone)
+				</td>
+			</tr>
+			<tr>
+				<td class="adminTitle">
+					@Html.SmartLabelFor(model => model.Priority)
+				</td>
+				<td class="adminData">
+					@Html.EditorFor(x => x.Priority)
+					@Html.ValidationMessageFor(model => model.Priority)
+				</td>
+			</tr>
+			<tr>
+				<td class="adminTitle">
+					@Html.SmartLabelFor(model => model.WidgetWrapContent)
+				</td>
+				<td class="adminData">
+					@Html.CheckBoxFor(model => model.WidgetWrapContent, new { data_toggler_for = "#pnlWidgetWrapContent" })
+					@Html.ValidationMessageFor(model => model.WidgetWrapContent)
+				</td>
+			</tr>
+		</tbody>
+		<tbody id="pnlWidgetWrapContent">
+			<tr>
+				<td class="adminTitle">
+					@Html.SmartLabelFor(model => model.WidgetShowTitle)
+				</td>
+				<td class="adminData">
+					@Html.CheckBoxFor(model => model.WidgetShowTitle, new { data_toggler_for = "#pnlTitleTag" })
+					@Html.ValidationMessageFor(model => model.WidgetShowTitle)
+				</td>
+			</tr>
+			<tr id="pnlTitleTag">
+				<td class="adminTitle">
+					@Html.SmartLabelFor(model => model.TitleTag)
+				</td>
+				<td class="adminData">
+					@Html.DropDownListFor(model => model.TitleTag, Model.AvailableTitleTags, new { @class = "autowidth", data_select_min_results_for_search = 100 })
+					@Html.ValidationMessageFor(model => model.TitleTag)
+				</td>
+			</tr>
+			<tr>
+				<td class="adminTitle">
+					@Html.SmartLabelFor(model => model.WidgetBordered)
+				</td>
+				<td class="adminData">
+					@Html.EditorFor(x => x.WidgetBordered)
+					@Html.ValidationMessageFor(model => model.WidgetBordered)
+				</td>
+			</tr>
+		</tbody>
+    </table>
+    
+    @(Html.LocalizedEditor<TopicModel, TopicLocalizedModel>("topic-info-localized",
+            @<table class="adminContent">
+                <tr>
+                    <td class="adminTitle">
+                        @Html.SmartLabelFor(model => model.Locales[item].Title)
+                    </td>
+                    <td class="adminData">
+						@*IMPORTANT: Do not delete, this hidden element contains the id to assign localized values to the corresponding language *@
+						@Html.HiddenFor(model => model.Locales[item].LanguageId, new { id = Html.FieldIdFor(model => model.Locales[item].LanguageId) + "_1" })
+
+                        @Html.EditorFor(model => Model.Locales[item].Title)
+                        @Html.ValidationMessageFor(model => model.Locales[item].Title)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="adminTitle">
+                        @Html.SmartLabelFor(model => model.Locales[item].Body)
+                    </td>
+                    <td class="adminData wide">
+                        @Html.EditorFor(model => model.Locales[item].Body, "Html", new { ForceRootBlock = false })
+                        @Html.ValidationMessageFor(model => model.Locales[item].Body)
+                    </td>
+                </tr>
+            </table>
+            ,
+            @<table class="adminContent">
+                <tr>
+                    <td class="adminTitle">
+                        @Html.SmartLabelFor(model => model.Title)
+                    </td>
+                    <td class="adminData">
+                        @Html.EditorFor(model => model.Title)
+                        @Html.ValidationMessageFor(model => model.Title)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="adminTitle">
+                        @Html.SmartLabelFor(model => model.Body)
+                    </td>
+                    <td class="adminData wide">
+                        @Html.EditorFor(x => x.Body, "Html", new { ForceRootBlock = false })
+                        @Html.ValidationMessageFor(model => model.Body)
+                    </td>
+                </tr>
+            </table>
+        ))
+}
+
+@helper TabSeo()
+{
+    @(Html.LocalizedEditor<TopicModel, TopicLocalizedModel>("topic-seo-localized",
+        @<table class="adminContent">
+            <tr>
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.Locales[item].MetaKeywords)
+                </td>
+                <td class="adminData">
+					@*IMPORTANT: Do not delete, this hidden element contains the id to assign localized values to the corresponding language *@
+					@Html.HiddenFor(model => model.Locales[item].LanguageId, new { id = Html.FieldIdFor(model => model.Locales[item].LanguageId) + "_2" })
+
+                    @Html.EditorFor(model => model.Locales[item].MetaKeywords)
+                    @Html.ValidationMessageFor(model => model.Locales[item].MetaKeywords)
+                </td>
+            </tr>
+            <tr>
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.Locales[item].MetaDescription)
+                </td>
+                <td class="adminData">
+                    @Html.TextAreaFor(model => model.Locales[item].MetaDescription)
+                    @Html.ValidationMessageFor(model => model.Locales[item].MetaDescription)
+                </td>
+            </tr>
+            <tr>
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.Locales[item].MetaTitle)
+                </td>
+                <td class="adminData">
+                    @Html.TextAreaFor(model => model.Locales[item].MetaTitle)
+                    @Html.ValidationMessageFor(model => model.Locales[item].MetaTitle)
+                </td>
+            </tr>
+			<tr>
+				<td class="adminTitle">
+					@Html.SmartLabelFor(model => model.Locales[item].SeName)
+				</td>
+				<td class="adminData">
+					@Html.EditorFor(model => model.Locales[item].SeName)
+					@Html.ValidationMessageFor(model => model.Locales[item].SeName)
+				</td>
+			</tr>
+        </table>
+        ,
+        @<table class="adminContent">
+            <tr>
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.MetaKeywords)
+                </td>
+                <td class="adminData">
+                    @Html.EditorFor(x => x.MetaKeywords)
+                    @Html.ValidationMessageFor(model => model.MetaKeywords)
+                </td>
+            </tr>
+            <tr>
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.MetaDescription)
+                </td>
+                <td class="adminData">
+                    @Html.TextAreaFor(x => x.MetaDescription)
+                    @Html.ValidationMessageFor(model => model.MetaDescription)
+                </td>
+            </tr>
+            <tr>
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.MetaTitle)
+                </td>
+                <td class="adminData">
+                    @Html.TextAreaFor(x => x.MetaTitle)
+                    @Html.ValidationMessageFor(model => model.MetaTitle)
+                </td>
+            </tr>
+            <tr>
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.SeName)
+                </td>
+                <td class="adminData">
+                    @Html.EditorFor(model => model.SeName)
+					@if (Model.Id != 0)
+					{
+						@Html.Action("NamesPerEntity", "UrlRecord", new { entityName = "Topic", entityId = Model.Id })
+					}
+                    @Html.ValidationMessageFor(model => model.SeName)
+                </td>
+            </tr>
+        </table>))
+}
+
+@helper TabStores()
+{
+	@Html.Partial("StoreSelector", Model)
+}

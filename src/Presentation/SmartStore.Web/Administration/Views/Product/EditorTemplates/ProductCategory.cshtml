@@ -1,0 +1,11 @@
+﻿<select name="Category" 
+		id="Category" 
+		class="form-control"
+		data-select-url='@Url.Action("AllCategories", "Category")'>
+</select>
+
+<script>
+    $(function () {
+        $('#Category').selectWrapper();
+    });
+</script>

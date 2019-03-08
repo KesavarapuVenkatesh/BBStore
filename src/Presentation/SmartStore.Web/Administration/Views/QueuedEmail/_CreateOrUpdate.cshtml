@@ -1,0 +1,140 @@
+﻿@model QueuedEmailModel
+
+@Html.ValidationSummary(true)
+@Html.HiddenFor(model => model.Id)
+
+<table class="adminContent">
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.Priority)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.Priority)
+            @Html.ValidationMessageFor(model => model.Priority)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.From)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.From)
+            @Html.ValidationMessageFor(model => model.From)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.To)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.To)
+            @Html.ValidationMessageFor(model => model.To)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.CC)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.CC)
+            @Html.ValidationMessageFor(model => model.CC)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.Bcc)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.Bcc)
+            @Html.ValidationMessageFor(model => model.Bcc)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.Subject)
+        </td>
+        <td class="adminData">
+            @Html.TextBoxFor(model => model.Subject)
+            @Html.ValidationMessageFor(model => model.Subject)
+        </td>
+    </tr>
+	@if (Model.Attachments.Any())
+	{
+		<tr>
+			<td class="adminTitle">
+				@Html.SmartLabelFor(model => model.Attachments)
+			</td>
+			<td class="adminData">
+				@foreach (var attach in Model.Attachments)
+				{
+					<span class="mr-3">
+						<i class="fa fa-paperclip"></i>
+						<a href='@Url.Action("DownloadAttachment", new { id = attach.Id })'>@attach.Name</a>
+					</span>
+				}
+			</td>
+		</tr>
+	}
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.Body)
+        </td>
+        <td class="adminData wide">
+            @Html.EditorFor(model => model.Body, "Html")
+            @Html.ValidationMessageFor(model => model.Body)
+        </td>
+    </tr>
+	<tr>
+		<td class="adminTitle">
+			@Html.SmartLabelFor(model => model.SendManually)
+		</td>
+		<td class="adminData">
+			@Html.EditorFor(model => model.SendManually)
+			@Html.ValidationMessageFor(model => model.SendManually)
+		</td>
+	</tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.SentTries)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.SentTries)
+            @Html.ValidationMessageFor(model => model.SentTries)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.SentOn)
+        </td>
+        <td class="adminData">
+            @if (Model.SentOn.HasValue)
+            {
+				<div class="form-control-plaintext">
+					@Html.DisplayFor(model => model.SentOn)
+				</div>
+			}
+			else
+			{
+				<div class="form-control-plaintext">@("".NaIfEmpty())</div>
+            }
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.EmailAccountName)
+        </td>
+        <td class="adminData">
+            @Html.TextBoxFor(model => model.EmailAccountName, new { @readonly = "readonly", @class = "form-control-plaintext" })
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.CreatedOn)
+        </td>
+        <td class="adminData">
+			<div class="form-control-plaintext">
+				@Html.DisplayFor(model => model.CreatedOn)
+			</div>
+        </td>
+    </tr>
+</table>
