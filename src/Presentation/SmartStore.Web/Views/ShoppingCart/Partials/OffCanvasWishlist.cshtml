@@ -109,10 +109,10 @@
                         <div class="ml-auto text-nowrap">
                             @if (Model.ShowItemsFromWishlistToCartButton)
                             {
-                                <a class="btn btn-secondary btn-sm btn-icon ajax-cart-link" title='@T("ShoppingCart.AddToCart")'
+                                <a class="btn btn-secondary btn-sm btn-icon ajax-cart-link" title='Buy'
                                     href="#"
                                     rel="nofollow"
-                                    data-href="@Url.Action("MoveItemBetweenCartAndWishlist", "ShoppingCart", new { cartItemId = item.Id, cartType = ShoppingCartType.Wishlist })"
+                                    data-href="@Url.Action("AddProduct", "ShoppingCart", new { productId = item.Id })"
                                     data-name="@item.ProductName"
                                     data-type="cart"
                                     data-action="addfromwishlist">

@@ -17,13 +17,13 @@
 	}
 	if (!Model.Price.CallForPrice)
 	{
-		var addToCartUrl = Url.Action("AddProductSimple", "ShoppingCart", new { productId = Model.Id, forceredirection = Model.Parent.ForceRedirectionAfterAddingToCart, area = "" });
+		var addToCartUrl = Url.Action("AddProduct", "ShoppingCart", new { productId = Model.Id });
 		var title = (Model.Price.AvailableForPreOrder ? T("ShoppingCart.PreOrder") : T("ShoppingCart.AddToCart"));
 
 		<a data-href='@addToCartUrl'
 			href="#"
 			class="btn btn-primary ajax-cart-link @cssClasses"
-			title="@title"
+			title="Buy"
 			data-toggle='@(!blockStyle ? "tooltip" : "")' data-placement="bottom"
 			rel="nofollow"
 			data-type="cart"
