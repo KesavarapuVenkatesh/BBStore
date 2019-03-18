@@ -1,16 +1,15 @@
 ﻿@model FooterModel
 @using SmartStore.Web.Models.Common;
-
-@{ 
+@{
 	var footerLinks = new List<Tuple<string, string>>
-	{
-		// Item1 = TopicUrl, Item2 = Locale Resource Key
-		new Tuple<string, string>(Url.TopicUrl("aboutus"), "AboutUs"),
-		new Tuple<string, string>(Url.TopicUrl("imprint"), "Imprint"),
-		new Tuple<string, string>(Url.TopicUrl("disclaimer"), "Disclaimer"),
-		new Tuple<string, string>(Url.TopicUrl("privacyinfo"), "PrivacyNotice"),
-		new Tuple<string, string>(Url.TopicUrl("conditionsofuse"), "ConditionsOfUse")
-	};
+{
+// Item1 = TopicUrl, Item2 = Locale Resource Key
+new Tuple<string, string>(Url.TopicUrl("aboutus"), "AboutUs"),
+new Tuple<string, string>(Url.TopicUrl("imprint"), "Imprint"),
+new Tuple<string, string>(Url.TopicUrl("disclaimer"), "Disclaimer"),
+new Tuple<string, string>(Url.TopicUrl("privacyinfo"), "PrivacyNotice"),
+new Tuple<string, string>(Url.TopicUrl("conditionsofuse"), "ConditionsOfUse")
+};
 
 	var socialLinks = new List<Tuple<string, string>>();
 	if (Model.FacebookLink.HasValue())
@@ -45,9 +44,7 @@
 
 	var invserseFooter = GetThemeVariable<bool>("inverse-footer");
 }
-
 @{ Html.RenderWidget("footer_top"); }
-
 @if (Model.ShowSocialLinks && socialLinks.Any())
 {
 	<div class="footer-social-wrapper">
@@ -65,19 +62,15 @@
 		</div>
 	</div>
 }
-
 <div class="footer-main-wrapper">
 	<div class="container footer-main">
 		<div class="row sm-gutters">
-
 			<div class="col-md-3">
 				<nav class="footer-links nav-collapsible">
 					<h4 class="footer-title nav-toggler collapsed" data-toggle="collapse" data-target="#footer-info" aria-controls="footer-info" aria-expanded="false">@T("Footer.Info")</h4>
 					<div class="collapse nav-collapse" id="footer-info">
 						<ul class="list-unstyled">
-
-                            @{ Html.RenderWidget("footer_col_1_before"); }
-
+							@{ Html.RenderWidget("footer_col_1_before"); }
 							@if (Model.ManufacturerEnabled)
 							{
 								<li><a class="footer-link" href="@Url.RouteUrl("ManufacturerList")">@T("Manufacturers.List")</a></li>
@@ -94,31 +87,26 @@
 							{
 								<li><a class="footer-link" href="@Url.RouteUrl("CompareProducts")">@T("Products.Compare.List")</a></li>
 							}
-
-                            @{ Html.RenderWidget("footer_col_1_after"); }
-
+							@{ Html.RenderWidget("footer_col_1_after"); }
 						</ul>
 					</div>
 				</nav>
 			</div>
-
 			<div class="col-md-3">
 				<nav class="footer-links nav-collapsible">
 					<h4 class="footer-title nav-toggler collapsed" data-toggle="collapse" data-target="#footer-service" aria-controls="footer-service" aria-expanded="false">
-                        <span class="d-none d-md-block">@T("Footer.Service")</span>
-                        <span class="d-md-none">@T("Footer.Service.Mobile")</span>
-                    </h4>
+						<span class="d-none d-md-block">@T("Footer.Service")</span>
+						<span class="d-md-none">@T("Footer.Service.Mobile")</span>
+					</h4>
 					<div class="collapse nav-collapse" id="footer-service">
 						<ul class="list-unstyled">
-
-                            @{ 
+							@{
 								Html.RenderWidget("footer_col_2_before");
 
 								var contactUsUrl = Url.RouteUrl("contactus");
 								var shippingInfoUrl = Url.TopicUrl("shippinginfo");
 								var paymentInfoUrl = Url.TopicUrl("paymentinfo");
 							}
-
 							@if (contactUsUrl.HasValue())
 							{
 								<li><a class="footer-link" href="@contactUsUrl">@T("ContactUs")</a></li>
@@ -139,25 +127,20 @@
 							{
 								<li><a class="footer-link" href="@paymentInfoUrl">@T("Paymentinfo")</a></li>
 							}
-
-                            @{ Html.RenderWidget("footer_col_2_after"); }
-
+							@{ Html.RenderWidget("footer_col_2_after"); }
 						</ul>
 					</div>
 				</nav>
 			</div>
-
 			<div class="col-md-3">
 				<nav class="footer-links company nav-collapsible">
 					<h4 class="footer-title nav-toggler collapsed" data-toggle="collapse" data-target="#footer-company" aria-controls="footer-company" aria-expanded="false">
-                        <span class="d-none d-md-block">@T("Footer.Company")</span>
-                        <span class="d-md-none">@T("Footer.Company.Mobile")</span>
-                    </h4>
+						<span class="d-none d-md-block">@T("Footer.Company")</span>
+						<span class="d-md-none">@T("Footer.Company.Mobile")</span>
+					</h4>
 					<div class="collapse nav-collapse" id="footer-company">
 						<ul class="list-unstyled">
-
-                            @{ Html.RenderWidget("footer_col_3_before"); }
-
+							@{ Html.RenderWidget("footer_col_3_before"); }
 							@foreach (var link in footerLinks)
 							{
 								if (link.Item1.HasValue())
@@ -165,19 +148,15 @@
 									<li><a class="footer-link" href="@link.Item1">@T(link.Item2)</a></li>
 								}
 							}
-
-                            @if (Model.DisplayLoginLink)
-                            {
-                                <li><a class="footer-link" href="@Url.RouteUrl("Login", new { ReturnUrl = Request.RawUrl })">@T("Account.Login")</a></li>
-                            }
-
-                            @{ Html.RenderWidget("footer_col_3_after"); }
-
+							@if (Model.DisplayLoginLink)
+							{
+								<li><a class="footer-link" href="@Url.RouteUrl("Login", new { ReturnUrl = Request.RawUrl })">@T("Account.Login")</a></li>
+							}
+							@{ Html.RenderWidget("footer_col_3_after"); }
 						</ul>
 					</div>
 				</nav>
 			</div>
-
 			<div class="col-md-3">
 				@if (!Model.HideNewsletterBlock)
 				{
@@ -196,7 +175,6 @@
 										</button>
 									</div>
 								</div>
-
 								<div class="d-none d-lg-block">
 									<div class="form-inline">
 										<div class="form-check form-check-inline">
@@ -205,7 +183,6 @@
 												<span>@T("Newsletter.Subscribe")</span>
 											</label>
 										</div>
-
 										<div class="form-check form-check-inline">
 											<input class="form-check-input" type="radio" id="newsletter-unsubscribe" value="newsletter-unsubscribe" name="optionsRadios">
 											<label class="form-check-label" for="newsletter-unsubscribe">
@@ -214,17 +191,13 @@
 										</div>
 									</div>
 								</div>
-
 								@{ Html.RenderWidget("gdpr_consent_small"); }
-
 								@Html.ValidationMessageFor(x => x.NewsletterEmail)
-
 							</div>
 							<div id="newsletter-result-block" class="alert alert-success d-none"></div>
 						</div>
 					</div>
 				}
-
 				@if (Model.ShowThemeSelector)
 				{
 					<div class="theme-selector d-none d-md-block">
@@ -240,13 +213,11 @@
 		</div>
 	</div>
 </div>
-
 @{ Html.RenderWidget("footer_bottom"); }
-
 <div class="footer-bottom-wrapper">
 	<div class="container footer-bottom">
 		<div class="row sm-gutters">
-			
+
 			@if (Model.ShowLegalInfo)
 			{
 				<div class="col pb-1 pb-sm-0">
@@ -254,13 +225,16 @@
 				</div>
 			}
 
-			@if (Model.SmartStoreHint.HasValue())
-			{
-				<div class="col-12 col-sm-auto pb-1 pb-sm-0 text-sm-center">
-					@Html.Raw(Model.SmartStoreHint)
-				</div>
-			}
+			@*@if (Model.SmartStoreHint.HasValue())
+				{
+					<div class="col-12 col-sm-auto pb-1 pb-sm-0 text-sm-center">
+						@Html.Raw(Model.SmartStoreHint)
+					</div>
+				}*@
 
+			<div class="col-12 col-sm-auto pb-1 pb-sm-0 text-sm-center">
+				<a href="www.behindbuy.com">Shopsystem by SmartStore AG © 2019</a>
+			</div>
 			<div class="col text-sm-right">
 				@T("Content.CopyrightNotice", DateTime.Now.Year.ToString(), Model.StoreName)
 			</div>

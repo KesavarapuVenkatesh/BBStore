@@ -49,7 +49,7 @@ namespace SmartStore.Web.Controllers
 {
 	public partial class CommonController : PublicControllerBase
     {
-		private readonly static string[] s_hints = new string[] { "Shopsystem", "Onlineshop Software", "Shopsoftware", "E-Commerce Solution" };
+		private readonly static string[] s_hints = new string[] { "BehindBuy", "Onlineshop Software", "Shopsoftware", "E-Commerce Solution" };
 
 		private readonly ICommonServices _services;
 		private readonly ITopicService _topicService;

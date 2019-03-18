@@ -7,17 +7,19 @@
 		@{
 			Html.RenderWidget("home_page_top");
 
-			Html.RenderAction("TopicBlock", "Topic", new { systemName = "HomePageText", isLead = true });
-			Html.RenderWidget("home_page_after_intro");
+			//	Html.RenderAction("TopicBlock", "Topic", new { systemName = "HomePageText", isLead = true });
+			//	Html.RenderWidget("home_page_after_intro");
 
-			Html.RenderAction("HomepageCategories", "Catalog");
-			Html.RenderWidget("home_page_after_categories");
+
 
 			Html.RenderAction("HomepageProducts", "Catalog");
 			Html.RenderWidget("home_page_after_products");
 
 			Html.RenderAction("HomepageBestSellers", "Catalog");
 			Html.RenderWidget("home_page_after_bestsellers");
+
+			Html.RenderAction("HomepageCategories", "Catalog");
+			Html.RenderWidget("home_page_after_categories");
 
 			Html.RenderAction("HomepageManufacturers", "Catalog");
 			Html.RenderWidget("home_page_after_manufacturers");
