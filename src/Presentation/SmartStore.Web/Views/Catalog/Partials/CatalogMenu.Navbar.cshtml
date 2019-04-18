@@ -76,6 +76,13 @@
 					<span>Home</span>
 				</a>
 			</li>
+			<li class='nav-item' id="main-nav-item-2" data-id="2">
+				@*<a asp-controller="Amazon" asp-action="Search">About User Information</a>*@
+
+				@Html.ActionLink("Amazon search", "Search",
+		new { controller = "Amazon"},
+		new { @class = "nav-link" })
+			</li>
 			showHomebutton = false;
 		}
 
