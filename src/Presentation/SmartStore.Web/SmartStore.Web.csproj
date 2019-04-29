@@ -267,6 +267,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>MvcLocalization.de.resx</DependentUpon>
     </Compile>
+    <Compile Include="Controllers\AmazonController.cs" />
     <Compile Include="Controllers\BoardsController.cs" />
     <Compile Include="Controllers\CatalogController.cs" />
     <Compile Include="Controllers\CatalogHelper.cs" />
@@ -1778,6 +1779,7 @@
     <Content Include="Views\ShoppingCart\Partials\_RefreshCartScript.cshtml" />
     <Content Include="Views\Common\Partials\CookieConsentBadge.cshtml" />
     <Content Include="Views\Common\Partials\GdprConsent.cshtml" />
+    <Content Include="Views\Amazon\Search.cshtml" />
     <None Include="Web.EFMigrations.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
